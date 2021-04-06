@@ -3,27 +3,54 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace BinChunker
+namespace chunky
 {
     public class CueFile 
     {
+        public enum CueType
+        {
+            File,
+            String,
+            Virtual
+        }
+
         public readonly ArrayList TrackList = new ArrayList();
         public readonly string BinFileName;
         private readonly string cueFilePath;
 
-        public CueFile( string cueFilePath ) 
+        public CueFile(string bin) : this(bin, CueType.Virtual)
         {
-            this.cueFilePath = cueFilePath;
-            Console.WriteLine("Reading the CUE file:");
-            string cueLines;
-            using (TextReader cueReader = new StreamReader( cueFilePath ) ) 
+
+        }
+
+        public CueFile(string str, CueType type) 
+        {
+            Regex trackRegex = new Regex( @"track\s+?(\d+?)\s+?(\S+?)[\s$]+?index\s+?\d+?\s+?(\S*)", RegexOptions.IgnoreCase | RegexOptions.Multiline );
+            string cueLines = "  TRACK 01 MODE1/2352\n    INDEX 01 00:00:00";
+            if (type == CueType.File)
             {
-                BinFileName = GetBinFileName( cueReader.ReadLine() );
-                cueLines = cueReader.ReadToEnd();
+                this.cueFilePath = str;
+                Console.WriteLine("Reading the CUE file:");
+                using (TextReader cueReader = new StreamReader(cueFilePath))
+                {
+                    BinFileName = GetBinFileName(cueReader.ReadLine());
+                    cueLines = cueReader.ReadToEnd();
+                }
             }
-				
-            Regex trackRegex = new Regex( @"track\s+?(\d+?)\s+?(\S+?)[\s$]+?index\s+?\d+?\s+?(\S*)", 
-                RegexOptions.IgnoreCase | RegexOptions.Multiline );
+            else if (type == CueType.String)
+            {
+                using (TextReader cueReader = new StreamReader(cueFilePath))
+                {
+                    BinFileName = GetBinFileName(cueReader.ReadLine());
+                    cueLines = cueReader.ReadToEnd();
+                }
+                cueLines = str;
+            }
+            else if (type == CueType.Virtual)
+            {
+                BinFileName = str;
+            }
+
             var matches = trackRegex.Matches( cueLines );
 
             if (matches.Count==0)
@@ -38,7 +65,7 @@ namespace BinChunker
                     trackMatch.Groups[2].Value,
                     trackMatch.Groups[3].Value );
 
-                if (BinChunk.Verbose)
+                if (chunky.Verbose)
                     Console.WriteLine(" (StartSector {0} ofs {1})", track.StartSector, track.StartPosition);
 				
                 if (prevTrack != null) 
@@ -52,7 +79,7 @@ namespace BinChunker
 
             if (track == null) return;
             track.Stop = GetBinFileLength();
-            track.StopSector = track.Stop / BinChunk.SectorLength;
+            track.StopSector = track.Stop / chunky.SectorLength;
             TrackList[ TrackList.Count -1 ] = track;
         }
 

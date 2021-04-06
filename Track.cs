@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using BinChunker;
+using chunky;
 
 class Track 
 {
@@ -36,7 +36,7 @@ class Track
 	/// </summary>
 	public long StartPosition 
 	{
-		get	{ return StartSector * BinChunk.SectorLength;	}
+		get	{ return StartSector * chunky.chunky.SectorLength;	}
 	}
 	
 	/// <summary>
@@ -105,12 +105,12 @@ class Track
 			throw new ApplicationException( string.Format("Could not seek to track location: {0}", e.Message ) );
 		}
 
-		if (BinChunk.Verbose) 
+		if (chunky.chunky.Verbose) 
 		{
-			Console.WriteLine( Environment.NewLine + "mmc sectors {0}.{1} ({2})", StartSector, StopSector, StopSector - StartSector + 1);
-			Console.WriteLine("mmc bytes {0}.{1} ({2})", StartPosition, Stop, Stop - StartPosition + 1);
-			Console.WriteLine("sector data at {0}, {1} bytes per sector", BlockStart, BlockSize);
-			Console.WriteLine("real data {0} bytes" + Environment.NewLine, (StopSector - StartSector + 1) * BlockSize);
+            Console.WriteLine(Environment.NewLine + "mmc sectors {0}.{1} ({2})", StartSector, StopSector, StopSector - StartSector + 1);
+            Console.WriteLine("mmc bytes {0}.{1} ({2})", StartPosition, Stop, Stop - StartPosition + 1);
+            Console.WriteLine("sector data at {0}, {1} bytes per sector", BlockStart, BlockSize);
+            Console.WriteLine("real data {0} bytes" + Environment.NewLine, (StopSector - StartSector + 1) * BlockSize);
 		}
 
 		Console.Write("                                          ");
@@ -127,17 +127,17 @@ class Track
 				long sector = StartSector;
 				long realsz = 0;
 
-				byte[] buf = new byte[ BinChunk.SectorLength ];
-				while ((sector <= StopSector) && (bf.Read(buf, 0, BinChunk.SectorLength) > 0)) 
+				byte[] buf = new byte[chunky.chunky.SectorLength ];
+				while ((sector <= StopSector) && (bf.Read(buf, 0, chunky.chunky.SectorLength) > 0)) 
 				{
-					if ( Audio && SwapAudioByteOrder )
-						DoByteSwap( buf );
+					if (Audio && SwapAudioByteOrder)
+                        DoByteSwap( buf );
 
 					stream.Write( buf, BlockStart, BlockSize);
-					sz += BinChunk.SectorLength;
+					sz += chunky.chunky.SectorLength;
 					realsz += BlockSize;
-					if (((sz / BinChunk.SectorLength) % 500) == 0) 
-						PrintProgress( realsz, RealLength );
+					if (((sz / chunky.chunky.SectorLength) % 500) == 0)
+                        PrintProgress( realsz, RealLength);
 					sector++;
 				}
 			}

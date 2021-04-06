@@ -5,11 +5,11 @@ using System.Reflection;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("BinChunk")]
+[assembly: AssemblyTitle("chunky")]
 [assembly: AssemblyDescription("CD image format conversion from bin/cue to iso/cdr")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BinChunk")]
+[assembly: AssemblyProduct("chunky")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
@@ -25,7 +25,7 @@ using System.Reflection;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("1.3.*")]
+[assembly: AssemblyVersion("0.1.*")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
